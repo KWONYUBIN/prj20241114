@@ -4,11 +4,13 @@ import { Button } from "../../components/ui/button.jsx";
 import { useState } from "react";
 import axios from "axios";
 import { toaster } from "../../components/ui/toaster.jsx";
+import { useNavigate } from "react-router-dom";
 
 export function MemberSignup() {
   const [id, setId] = useState("");
   const [password, setPassword] = useState("");
   const [description, setDescription] = useState("");
+  const navigate = useNavigate();
 
   function handleSaveClick() {
     axios
@@ -21,6 +23,9 @@ export function MemberSignup() {
           type: message.type,
           description: message.text,
         });
+
+        // TODO: login 으로 이동
+        navigate("/");
       })
       .catch((e) => {
         console.log("안됐을 때 해야하는 일, 토스트 출력");
