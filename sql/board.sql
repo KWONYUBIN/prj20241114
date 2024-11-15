@@ -2,6 +2,8 @@
 
 
 CREATE TABLE board
+
+
 (
     id       INT PRIMARY KEY AUTO_INCREMENT,
     title    VARCHAR(300)  NOT NULL,
