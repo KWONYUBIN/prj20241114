@@ -7,6 +7,7 @@ import { BoardEdit } from "./page/board/BoardEdit.jsx";
 import { MemberSignup } from "./page/member/MemberSignup.jsx";
 import { MemberList } from "./page/member/MemberList.jsx";
 import { MemberInfo } from "./page/member/MemberInfo.jsx";
+import { MemberEdit } from "./page/member/MemberEdit.jsx";
 
 const router = createBrowserRouter([
   {
@@ -35,7 +36,7 @@ const router = createBrowserRouter([
         path: "member/:id",
         element: <MemberInfo />,
       },
-      { path: "member/edit/:id", element: <div>회원정보 수정</div> },
+      { path: "member/edit/:id", element: <MemberEdit /> },
     ],
   },
 ]);
