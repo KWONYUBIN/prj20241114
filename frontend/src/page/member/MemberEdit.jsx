@@ -114,7 +114,7 @@ export function MemberEdit() {
           <Input defaultValue={member.id} />
         </Field>
         <Field label={"이메일"}>
-          <Group>
+          <Group attached w={"100%"}>
             <Input
               value={email}
               onChange={(e) => {
@@ -129,6 +129,7 @@ export function MemberEdit() {
               }}
             />
             <Button
+              variant={"outline"}
               onClick={handleEmailCheckClick}
               disabled={emailCheckButtonDisabled}
             >
