@@ -1,4 +1,4 @@
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { Box, Input, Spinner, Stack, Textarea } from "@chakra-ui/react";
@@ -14,6 +14,7 @@ import {
   DialogTrigger,
 } from "../../components/ui/dialog.jsx";
 import { Button } from "../../components/ui/button.jsx";
+import { toaster } from "../../components/ui/toaster.jsx";
 
 export function MemberEdit() {
   const { id } = useParams();
@@ -22,6 +23,7 @@ export function MemberEdit() {
   const [oldPassword, setOldPassword] = useState("");
   const [description, setDescription] = useState("");
   const [open, setOpen] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     axios.get(`/api/member/${id}`).then((res) => {
@@ -39,9 +41,27 @@ export function MemberEdit() {
         description,
         oldPassword,
       })
-      .then()
-      .catch()
-      .finally();
+      .then((res) => {
+        const message = res.data.message;
+
+        toaster.create({
+          type: message.type,
+          description: message.text,
+        });
+        navigate(`/member/${id}`);
+      })
+      .catch((e) => {
+        const message = e.response.data.message;
+
+        toaster.create({
+          type: message.type,
+          description: message.text,
+        });
+      })
+      .finally(() => {
+        setOpen(false);
+        setOldPassword("");
+      });
   }
 
   if (member === null) {
