@@ -11,8 +11,8 @@ public interface MemberMapper {
 
     @Insert("""
             INSERT INTO member
-            (id, password, description)
-            VALUES (#{id}, #{password}, #{description})
+            (id, email, password, description)
+            VALUES (#{id}, #{email}, #{password}, #{description})
             """)
     int insert(Member member);
 
@@ -45,4 +45,10 @@ public interface MemberMapper {
     int update(MemberEdit member);
 
 
+    @Select("""
+            SELECT *
+            FROM member
+            WHERE email = #{email}
+            """)
+    Member selectByEmail(String email);
 }
