@@ -4,6 +4,7 @@ import com.example.backend.dto.member.Member;
 import com.example.backend.dto.member.MemberEdit;
 import com.example.backend.service.member.MemberService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -11,12 +12,30 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Map;
 
+@Slf4j
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/member")
 public class MemberController {
 
     final MemberService service;
+
+    @PostMapping("login")
+    public ResponseEntity<Map<String, Object>> login(@RequestBody Member member) {
+        String token = service.token(member);
+
+        if (token != null) {
+            // 로그인 성공
+            return ResponseEntity.ok(Map.of("token", token,
+                    "message", Map.of("type", "success",
+                            "text", "로그인 되었습니다.")));
+        } else {
+            // 로그인 실패
+            return ResponseEntity.status(401)
+                    .body(Map.of("message", Map.of("type", "warning",
+                            "text", "아이디와 암호를 확인해주세요.")));
+        }
+    }
 
     @PutMapping("update")
     public ResponseEntity<Map<String, Object>> update(@RequestBody MemberEdit member) {
