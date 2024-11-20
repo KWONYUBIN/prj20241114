@@ -18,35 +18,56 @@ public class BoardController {
     final BoardService service;
 
     @PutMapping("update")
-    public ResponseEntity<Map<String, Object>> update(@RequestBody Board board) {
-        if (service.validate(board)) {
-            if (service.update(board)) {
-                return ResponseEntity.ok()
-                        .body(Map.of("message", Map.of("type", "success",
-                                "text", STR."\{board.getId()}번 게시물이 수정되었습니다.")));
-            } else {
-                return ResponseEntity.internalServerError()
-                        .body(Map.of("message", Map.of("type", "error",
-                                "text", STR."\{board.getId()}번 게시물이 수정되지 않았습니다.")));
-            }
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<Map<String, Object>> update(
+            @RequestBody Board board,
+            Authentication authentication) {
+        if (service.hasAccess(board.getId(), authentication)) {
 
+
+            if (service.validate(board)) {
+                if (service.update(board)) {
+                    return ResponseEntity.ok()
+                            .body(Map.of("message", Map.of("type", "success",
+                                    "text", STR."\{board.getId()}번 게시물이 수정되었습니다.")));
+                } else {
+                    return ResponseEntity.internalServerError()
+                            .body(Map.of("message", Map.of("type", "error",
+                                    "text", STR."\{board.getId()}번 게시물이 수정되지 않았습니다.")));
+                }
+
+            } else {
+                return ResponseEntity.badRequest()
+                        .body(Map.of("message", Map.of("type", "warning",
+                                "text", "제목이나 본문이 비어있을 수 없습니다.")));
+            }
         } else {
-            return ResponseEntity.badRequest()
-                    .body(Map.of("message", Map.of("type", "warning",
-                            "text", "제목이나 본문이 비어있을 수 없습니다.")));
+            return ResponseEntity.status(403)
+                    .body(Map.of("message", Map.of("type", "error"
+                            , "text", "수정 권한이 없습니다.")));
         }
     }
 
     @DeleteMapping("delete/{id}")
-    public ResponseEntity<Map<String, Object>> delete(@PathVariable int id) {
-        if (service.remove(id)) {
-            return ResponseEntity.ok()
-                    .body(Map.of("message", Map.of("type", "success"
-                            , "text", STR."\{id}번 게시글이 삭제되었습니다.")));
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<Map<String, Object>> delete(
+            @PathVariable int id,
+            Authentication authentication) {
+        if (service.hasAccess(id, authentication)) {
+            if (service.remove(id)) {
+                return ResponseEntity.ok()
+                        .body(Map.of("message", Map.of("type", "success"
+                                , "text", STR."\{id}번 게시글이 삭제되었습니다.")));
+            } else {
+                return ResponseEntity.internalServerError()
+                        .body(Map.of("message", Map.of("type", "error"
+                                , "text", "게시글 삭제 중 문제가 발생하였습니다.")));
+            }
+
         } else {
-            return ResponseEntity.internalServerError()
+            return ResponseEntity.status(403)
                     .body(Map.of("message", Map.of("type", "error"
-                            , "text", "게시글 삭제 중 문제가 발생하였습니다.")));
+                            , "text", "삭제 권한이 없습니다.")));
         }
     }
 

@@ -4,6 +4,7 @@ import com.example.backend.dto.member.Member;
 import com.example.backend.dto.member.MemberEdit;
 import com.example.backend.mapper.member.MemberMapper;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.jwt.JwtClaimsSet;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
@@ -12,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -74,6 +76,10 @@ public class MemberService {
 
     public String token(Member member) {
         Member db = mapper.selectById(member.getId());
+        List<String> auths = mapper.selectAuthByMemberId(member.getId());
+        String authsString = auths.stream()
+                .collect(Collectors.joining(" "));
+
         if (db != null) {
             if (db.getPassword().equals(member.getPassword())) {
                 // token 만들어서 리턴
@@ -82,7 +88,7 @@ public class MemberService {
                         .subject(member.getId())
                         .issuedAt(Instant.now())
                         .expiresAt(Instant.now().plusSeconds(60 * 60 * 24 * 7))
-//                        .claim("scope", "")
+                        .claim("scope", authsString)
                         .build();
 
                 return jwtEncoder.encode(JwtEncoderParameters.from(claims)).getTokenValue();
@@ -90,5 +96,16 @@ public class MemberService {
         }
 
         return null;
+    }
+
+    public boolean hasAccess(String id, Authentication auth) {
+        return id.equals(auth.getName());
+    }
+
+    public boolean isAdmin(Authentication auth) {
+        return auth.getAuthorities()
+                .stream()
+                .map(a -> a.toString())
+                .anyMatch(s -> s.equals("SCOPE_admin"));
     }
 }

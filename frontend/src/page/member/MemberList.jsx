@@ -29,6 +29,7 @@ export function MemberList() {
         <Table.Header>
           <Table.Row>
             <Table.ColumnHeader>ID</Table.ColumnHeader>
+            <Table.ColumnHeader>EMAIL</Table.ColumnHeader>
             <Table.ColumnHeader>가입일시</Table.ColumnHeader>
           </Table.Row>
         </Table.Header>

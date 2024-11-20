@@ -1,6 +1,6 @@
 import { useNavigate, useParams } from "react-router-dom";
 import { Box, Input, Spinner, Stack, Textarea } from "@chakra-ui/react";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import axios from "axios";
 import { Field } from "../../components/ui/field.jsx";
 import { Button } from "../../components/ui/button.jsx";
@@ -15,11 +15,14 @@ import {
   DialogTrigger,
 } from "../../components/ui/dialog.jsx";
 import { toaster } from "../../components/ui/toaster.jsx";
+import { AuthenticationContext } from "../../components/context/AuthenticationProvider.jsx";
 
 export function BoardEdit() {
   const [board, setBoard] = useState(null);
   const [progress, setProgress] = useState(false);
   const [dialogOpen, setDialogOpen] = useState(false);
+
+  const { hasAccess } = useContext(AuthenticationContext);
 
   const { id } = useParams();
   const navigate = useNavigate();
@@ -80,42 +83,44 @@ export function BoardEdit() {
             onChange={(e) => setBoard({ ...board, content: e.target.value })}
           />
         </Field>
-        <Box>
-          <DialogRoot
-            open={dialogOpen}
-            onOpenChange={(e) => setDialogOpen(e.open)}
-          >
-            <DialogTrigger asChild>
-              <Button
-                disabled={disabled}
-                colorPalette={"cyan"}
-                variant={"outline"}
-              >
-                저장
-              </Button>
-            </DialogTrigger>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>저장 확인</DialogTitle>
-              </DialogHeader>
-              <DialogBody>
-                <p>{board.id}번 게시물을 수정하시겠습니까?</p>
-              </DialogBody>
-              <DialogFooter>
-                <DialogActionTrigger>
-                  <Button variant={"outline"}>취소</Button>
-                </DialogActionTrigger>
+        {hasAccess(board.writer) && (
+          <Box>
+            <DialogRoot
+              open={dialogOpen}
+              onOpenChange={(e) => setDialogOpen(e.open)}
+            >
+              <DialogTrigger asChild>
                 <Button
-                  loading={progress}
-                  colorPalette={"blue"}
-                  onClick={handleSaveClick}
+                  disabled={disabled}
+                  colorPalette={"cyan"}
+                  variant={"outline"}
                 >
                   저장
                 </Button>
-              </DialogFooter>
-            </DialogContent>
-          </DialogRoot>
-        </Box>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>저장 확인</DialogTitle>
+                </DialogHeader>
+                <DialogBody>
+                  <p>{board.id}번 게시물을 수정하시겠습니까?</p>
+                </DialogBody>
+                <DialogFooter>
+                  <DialogActionTrigger>
+                    <Button variant={"outline"}>취소</Button>
+                  </DialogActionTrigger>
+                  <Button
+                    loading={progress}
+                    colorPalette={"blue"}
+                    onClick={handleSaveClick}
+                  >
+                    저장
+                  </Button>
+                </DialogFooter>
+              </DialogContent>
+            </DialogRoot>
+          </Box>
+        )}
       </Stack>
     </Box>
   );
