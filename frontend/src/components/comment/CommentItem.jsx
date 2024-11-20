@@ -1,13 +1,26 @@
-import { Box, Flex } from "@chakra-ui/react";
+import { Box, Group, Textarea } from "@chakra-ui/react";
+import { Button } from "../ui/button.jsx";
+import { useState } from "react";
 
-export function CommentItem({ comment }) {
+export function CommentInput({ boardId, onSaveClick }) {
+  const [comment, setComment] = useState("");
+
   return (
-    <Box boarder={"1px solid black"} m={5}>
-      <Flex justify={"space-between"}>
-        <h3>{comment.memberId}</h3>
-        <h4>{comment.inserted}</h4>
-      </Flex>
-      <p>{comment.comment}</p>
+    <Box>
+      <Group>
+        <Textarea
+          value={comment}
+          onChange={(e) => setComment(e.target.value)}
+        />
+        <Button
+          onClick={() => {
+            setComment("");
+            onSaveClick(comment);
+          }}
+        >
+          댓글 쓰기
+        </Button>
+      </Group>
     </Box>
   );
 }

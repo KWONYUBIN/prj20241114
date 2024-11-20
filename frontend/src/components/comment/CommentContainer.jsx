@@ -6,18 +6,33 @@ import axios from "axios";
 
 export function CommentContainer({ boardId }) {
   const [commentList, setCommentList] = useState([]);
+  const [processing, setProcessing] = useState(false);
 
   useEffect(() => {
-    axios
-      .get(`/api/comment/list/${boardId}`)
-      .then((res) => res.data)
-      .then((data) => setCommentList(data));
-  }, []);
+    if (!processing) {
+      axios
+        .get(`/api/comment/list/${boardId}`)
+        .then((res) => res.data)
+        .then((data) => setCommentList(data));
+    }
+  }, [processing]);
 
   function handleSaveClick(comment) {
-    axios.post("/api/comment/add", {
-      boardId: boardId,
-      comment: comment,
+    setProcessing(true);
+    axios
+      .post("/api/comment/add", {
+        boardId: boardId,
+        comment: comment,
+      })
+      .finally(() => {
+        setProcessing(false);
+      });
+  }
+
+  function handleDeleteClick(id) {
+    setProcessing(true);
+    axios.delete(`/api/comment/remove/${id}`).finally(() => {
+      setProcessing(false);
     });
   }
 
@@ -26,7 +41,11 @@ export function CommentContainer({ boardId }) {
       <Stack gap={5}>
         <h3>댓글</h3>
         <CommentInput boardId={boardId} onSaveClick={handleSaveClick} />
-        <CommentList boardId={boardId} commentList={commentList} />
+        <CommentList
+          boardId={boardId}
+          commentList={commentList}
+          onDeleteClick={handleDeleteClick}
+        />
       </Stack>
     </Box>
   );
