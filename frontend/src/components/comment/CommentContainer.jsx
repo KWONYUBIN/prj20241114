@@ -44,6 +44,23 @@ export function CommentContainer({ boardId }) {
     });
   }
 
+  function handleEditClick(id, comment) {
+    setProcessing(true);
+
+    axios
+      .put(`/api/comment/edit`, { id, comment })
+      .then((res) => res.data.message)
+      .then((message) => {
+        toaster.create({
+          type: message.type,
+          description: message.text,
+        });
+      })
+      .finally(() => {
+        setProcessing(false);
+      });
+  }
+
   return (
     <Box>
       <Stack gap={5}>
@@ -53,6 +70,7 @@ export function CommentContainer({ boardId }) {
           boardId={boardId}
           commentList={commentList}
           onDeleteClick={handleDeleteClick}
+          onEditClick={handleEditClick}
         />
       </Stack>
     </Box>
