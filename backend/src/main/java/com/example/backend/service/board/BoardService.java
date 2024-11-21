@@ -4,6 +4,7 @@ import com.example.backend.dto.board.Board;
 import com.example.backend.dto.board.BoardFile;
 import com.example.backend.mapper.board.BoardMapper;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,6 +21,9 @@ import java.util.Map;
 public class BoardService {
 
     final BoardMapper mapper;
+
+    @Value("${image.src.prefix}")
+    String imageSrcPrefix;
 
     public boolean add(Board board, MultipartFile[] files, Authentication authentication) {
 
@@ -77,11 +81,11 @@ public class BoardService {
     public Board get(int id) {
         Board board = mapper.selectById(id);
         List<String> fileNameList = mapper.selectFilesByBoardId(id);
-        List<BoardFile> fileSrcName = fileNameList.stream()
-                .map(name -> new BoardFile(name, STR." http://172.30.1.89:8081/\{id}/\{name}"))
+        List<BoardFile> fileSrcList = fileNameList.stream()
+                .map(name -> new BoardFile(name, STR."\{imageSrcPrefix}/\{id}/\{name}"))
                 .toList();
 
-        board.setFileList(fileSrcName);
+        board.setFileList(fileSrcList);
         return board;
     }
 
@@ -101,7 +105,6 @@ public class BoardService {
         int cnt = mapper.update(board);
         return cnt == 1;
     }
-
 
     public boolean hasAccess(int id, Authentication authentication) {
         Board board = mapper.selectById(id);
