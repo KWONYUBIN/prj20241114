@@ -80,4 +80,10 @@ public interface BoardMapper {
             </script>
             """)
     Integer countAll(String searchType, String keyword);
+
+    @Insert("""
+            INSERT INTO board_file
+            VALUE (#{id}, #{fileName})
+            """)
+    int insertFile(Integer id, String fileName);
 }
