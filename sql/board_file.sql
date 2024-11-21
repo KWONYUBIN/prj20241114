@@ -6,3 +6,6 @@ CREATE TABLE board_file
     name     VARCHAR(300) NOT NULL,
     PRIMARY KEY (board_id, name)
 );
+
+SELECT *
+FROM board_file;

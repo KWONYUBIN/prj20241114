@@ -1,6 +1,7 @@
 package com.example.backend.service.board;
 
 import com.example.backend.dto.board.Board;
+import com.example.backend.dto.board.BoardFile;
 import com.example.backend.mapper.board.BoardMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
@@ -50,6 +51,8 @@ public class BoardService {
                 // board_file 테이블에 파일명 입력
                 mapper.insertFile(board.getId(), file.getOriginalFilename());
             }
+
+
         }
 
         return cnt == 1;
@@ -72,7 +75,14 @@ public class BoardService {
     }
 
     public Board get(int id) {
-        return mapper.selectById(id);
+        Board board = mapper.selectById(id);
+        List<String> fileNameList = mapper.selectFilesByBoardId(id);
+        List<BoardFile> fileSrcName = fileNameList.stream()
+                .map(name -> new BoardFile(name, STR." http://172.30.1.89:8081/\{id}/\{name}"))
+                .toList();
+
+        board.setFileList(fileSrcName);
+        return board;
     }
 
     public boolean validate(Board board) {
@@ -91,6 +101,7 @@ public class BoardService {
         int cnt = mapper.update(board);
         return cnt == 1;
     }
+
 
     public boolean hasAccess(int id, Authentication authentication) {
         Board board = mapper.selectById(id);
