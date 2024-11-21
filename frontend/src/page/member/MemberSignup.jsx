@@ -125,6 +125,7 @@ export function MemberSignup() {
           <Group attached w={"100%"}>
             <Input
               value={email}
+
               onChange={(e) => {
                 setEmail(e.target.value);
                 // 이메일은 필수 입력이 아니어서
