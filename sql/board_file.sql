@@ -7,6 +7,7 @@ CREATE TABLE board_file
     PRIMARY KEY (board_id, name)
 );
 
+
 SELECT *
 FROM board_file;
 
